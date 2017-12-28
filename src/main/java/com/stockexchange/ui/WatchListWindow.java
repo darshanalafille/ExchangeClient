@@ -8,7 +8,9 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.stockexchange.entity.local.BidAskBean;
 import com.stockexchange.entity.local.TradeSymbol;
+import com.stockexchange.store.OrderBookStore;
 import com.stockexchange.store.SymbolStore;
 
 import java.io.IOException;
@@ -51,9 +53,11 @@ public class WatchListWindow implements UpdateWindow{
         textGraphics.putString(2, 5, "SYMBOL", SGR.BOLD);
         textGraphics.putString(12,5, "NAME", SGR.BOLD);
         textGraphics.putString(52,5, "LTP", SGR.BOLD);
-        textGraphics.putString(62,5,"OFFERS",SGR.BOLD);
-        textGraphics.putString(72,5,"BIDS",SGR.BOLD);
-        textGraphics.putString(82,5,"VOLUME",SGR.BOLD);
+        textGraphics.putString(62,5,"BID_QTY",SGR.BOLD);
+        textGraphics.putString(77,5,"BID_PRICE",SGR.BOLD);
+        textGraphics.putString(92,5,"OFFER_QTY",SGR.BOLD);
+        textGraphics.putString(107,5,"OFFER_PRICE",SGR.BOLD);
+        textGraphics.putString(122,5,"VOLUME",SGR.BOLD);
 
         List<TradeSymbol> tradeSymbolList = null;
 
@@ -73,8 +77,11 @@ public class WatchListWindow implements UpdateWindow{
                 int count = 1;
 
                 for(TradeSymbol tr : tradeSymbolList){
+
                     textGraphics.putString(startCol,(startRaw+count),tr.getSymbol());
-                    for(int j = 0; j < 5; j++){
+                    BidAskBean bestBidAsk = OrderBookStore.getBestBidAsk(tr.getSymbol());
+
+                    for(int j = 0; j < 7; j++){
 
                         switch (j){
                             case 0 :
@@ -87,15 +94,24 @@ public class WatchListWindow implements UpdateWindow{
                                 break;
                             case 2:
                                 textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
-                                textGraphics.putString(terminal.getCursorPosition().withColumn(62),Integer.toString((int)tr.getAvilSell()));
+                                textGraphics.putString(terminal.getCursorPosition().withColumn(62),Integer.toString((int)tr.getAvilBuy()));
                                 break;
                             case 3:
-                                textGraphics.setForegroundColor(TextColor.ANSI.RED);
-                                textGraphics.putString(terminal.getCursorPosition().withColumn(72),Integer.toString((int)tr.getAvilBuy()));
+                                textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
+                                textGraphics.putString(terminal.getCursorPosition().withColumn(77),Double.toString(bestBidAsk.getBestBid()));
                                 break;
                             case 4:
+                                textGraphics.setForegroundColor(TextColor.ANSI.MAGENTA);
+                                textGraphics.putString(terminal.getCursorPosition().withColumn(92),Integer.toString((int)tr.getAvilSell()));
+                                break;
+                            case 5:
+                                textGraphics.setForegroundColor(TextColor.ANSI.MAGENTA);
+                                textGraphics.putString(terminal.getCursorPosition().withColumn(107),Double.toString(bestBidAsk.getBestAsk()));
+                                break;
+                            case 6:
                                 textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
-                                textGraphics.putString(terminal.getCursorPosition().withColumn(82),Integer.toString((int)tr.getTotal()));
+                                textGraphics.putString(terminal.getCursorPosition().withColumn(122),Double.toString((long)tr.getTotal()));
+                                break;
                             default:
                                 break;
                         }

@@ -1,5 +1,6 @@
 package com.stockexchange.store;
 
+import com.stockexchange.entity.local.BidAskBean;
 import com.stockexchange.entity.local.OrderBookBeanLocal;
 import com.stockexchange.entity.price.OrderBook;
 import com.stockexchange.entity.price.OrderBookRaw;
@@ -34,6 +35,21 @@ public class OrderBookStore {
         }
         return orderBook;
     }
+
+    public static BidAskBean getBestBidAsk(String symbol){
+
+        BidAskBean bidAskBean = null;
+        OrderBookBeanLocal local = beanLocalMap.get(symbol);
+        if(local != null){
+            if(local.getOrderBook().getRaws().size() > 0){
+                OrderBookRaw firstRaw = local.getOrderBook().getRaws().get(0);
+                return new BidAskBean(symbol,firstRaw.getBidValue(),firstRaw.getAskValue());
+            }
+        }
+        return new BidAskBean(symbol,0,0);
+    }
+
+
 
     public static OrderBook getOrderBookDepthByPrice(String symbol){
 
