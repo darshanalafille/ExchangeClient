@@ -43,4 +43,15 @@ public class TimeAndSalesStore {
         return rev;
     }
 
+    public static String getLastTradedTime(String symbol){
+
+        for(int i = timeAndSales.size(); i > 0; i--){
+            if(timeAndSales.get(i-1).getSymbol().equals(symbol)){
+                return timeAndSales.get(i-1).getTime();
+            }
+        }
+
+        return null;
+    }
+
 }

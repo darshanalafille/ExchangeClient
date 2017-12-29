@@ -12,8 +12,10 @@ import com.stockexchange.entity.local.BidAskBean;
 import com.stockexchange.entity.local.TradeSymbol;
 import com.stockexchange.store.OrderBookStore;
 import com.stockexchange.store.SymbolStore;
+import com.stockexchange.store.TimeAndSalesStore;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,12 +54,13 @@ public class WatchListWindow implements UpdateWindow{
 
         textGraphics.putString(2, 5, "SYMBOL", SGR.BOLD);
         textGraphics.putString(12,5, "NAME", SGR.BOLD);
-        textGraphics.putString(52,5, "LTP", SGR.BOLD);
+        textGraphics.putString(54,5, "LTP", SGR.BOLD);
         textGraphics.putString(62,5,"BID_QTY",SGR.BOLD);
         textGraphics.putString(77,5,"BID_PRICE",SGR.BOLD);
         textGraphics.putString(92,5,"OFFER_QTY",SGR.BOLD);
         textGraphics.putString(107,5,"OFFER_PRICE",SGR.BOLD);
         textGraphics.putString(122,5,"VOLUME",SGR.BOLD);
+        textGraphics.putString(140,5,"TRADE_TIME",SGR.BOLD);
 
         List<TradeSymbol> tradeSymbolList = null;
 
@@ -78,10 +81,11 @@ public class WatchListWindow implements UpdateWindow{
 
                 for(TradeSymbol tr : tradeSymbolList){
 
+                    textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
                     textGraphics.putString(startCol,(startRaw+count),tr.getSymbol());
                     BidAskBean bestBidAsk = OrderBookStore.getBestBidAsk(tr.getSymbol());
 
-                    for(int j = 0; j < 7; j++){
+                    for(int j = 0; j < 8; j++){
 
                         switch (j){
                             case 0 :
@@ -90,7 +94,9 @@ public class WatchListWindow implements UpdateWindow{
                                 break;
                             case 1:
                                 textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
-                                textGraphics.putString(terminal.getCursorPosition().withColumn(52),Double.toString(tr.getPrice()));
+                                String ltpStr = Double.toString(tr.getPrice());
+                                int startPosition = (8 - ltpStr.length()) + 52;
+                                textGraphics.putString(terminal.getCursorPosition().withColumn(startPosition),ltpStr);
                                 break;
                             case 2:
                                 textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
@@ -98,7 +104,9 @@ public class WatchListWindow implements UpdateWindow{
                                 break;
                             case 3:
                                 textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
-                                textGraphics.putString(terminal.getCursorPosition().withColumn(77),Double.toString(bestBidAsk.getBestBid()));
+                                String bestBidStr = Double.toString(bestBidAsk.getBestBid());
+                                int startPos = (8-bestBidStr.length()) + 77;
+                                textGraphics.putString(terminal.getCursorPosition().withColumn(startPos),bestBidStr);
                                 break;
                             case 4:
                                 textGraphics.setForegroundColor(TextColor.ANSI.MAGENTA);
@@ -106,12 +114,22 @@ public class WatchListWindow implements UpdateWindow{
                                 break;
                             case 5:
                                 textGraphics.setForegroundColor(TextColor.ANSI.MAGENTA);
-                                textGraphics.putString(terminal.getCursorPosition().withColumn(107),Double.toString(bestBidAsk.getBestAsk()));
+                                String bestAskStr = Double.toString(bestBidAsk.getBestAsk());
+                                int stp = (8-bestAskStr.length()) + 107;
+                                textGraphics.putString(terminal.getCursorPosition().withColumn(stp),bestAskStr);
                                 break;
                             case 6:
                                 textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
-                                textGraphics.putString(terminal.getCursorPosition().withColumn(122),Double.toString((long)tr.getTotal()));
+                                long lx = Double.valueOf(tr.getTotal()).longValue();
+                                textGraphics.putString(terminal.getCursorPosition().withColumn(122),Long.toString(lx));
                                 break;
+                            case 7:
+                                textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
+                                String ltt = TimeAndSalesStore.getLastTradedTime(tr.getSymbol());
+                                if(ltt != null){
+                                    textGraphics.putString(terminal.getCursorPosition().withColumn(140), ltt);
+                                }
+
                             default:
                                 break;
                         }
@@ -125,11 +143,11 @@ public class WatchListWindow implements UpdateWindow{
 
             terminal.flush();
 
-            try {
-                Thread.sleep(250);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(250);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 
             keyStroke = terminal.pollInput();
         }
