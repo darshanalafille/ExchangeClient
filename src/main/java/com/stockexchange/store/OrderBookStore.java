@@ -1,5 +1,6 @@
 package com.stockexchange.store;
 
+
 import com.stockexchange.entity.local.BidAskBean;
 import com.stockexchange.entity.local.OrderBookBeanLocal;
 import com.stockexchange.entity.price.OrderBook;

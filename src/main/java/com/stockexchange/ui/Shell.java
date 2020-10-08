@@ -39,20 +39,21 @@ public class Shell {
                 System.out.println("Invalid Command Syntax, ex - (ob 1010)");
             }else {
                 String symbol = obCommand[1];
-                new OrderBookWindow(symbol);
+                Runnable runnable = () -> new OrderBookWindow(symbol);
+                new Thread(runnable).start();
             }
         }else if(command.startsWith("qt")|| command.equals("qt") ){
             String [] obCommand = command.split("\\s+");
             if(obCommand.length >= 2){
-                new QuotesWindow(obCommand[1]);
+                new Thread(() -> new QuotesWindow(obCommand[1])).start();
             }else {
-                new QuotesWindow();
+                new Thread(() -> new QuotesWindow()).start();
             }
 
         }else if(command.equals("gui")){
             new GUITest();
         }else if(command.equals("ts")){
-            new TimeAndSalesWindow();
+            new Thread(() -> new TimeAndSalesWindow()).start();
         }
     }
 

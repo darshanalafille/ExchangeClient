@@ -25,8 +25,8 @@ import java.net.Socket;
  */
 public class PriceClient {
 
-    private final static String ip = "192.168.16.91";
-//    private final static String ip = "127.0.0.1";
+//    private final static String ip = "192.168.16.91";
+    private final static String ip = "127.0.0.1";
     private final static int port = 16500;
 
     private static PriceClient priceClient = null;
@@ -82,7 +82,7 @@ public class PriceClient {
 
     private void processMessage(String msg){
 
-        //System.out.println(msg);
+        System.out.println(msg);
         JsonObject object = parser.parse(msg).getAsJsonObject();
         String messageType = object.get("messageType").getAsString();
         DfnMessage dfnMessage = null;
